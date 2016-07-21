@@ -1,0 +1,13 @@
+{
+    "name": "hoanganh25991/github-webhook",
+    "description": "auto deploy by git notification from github when commit to remote",
+    "type": "lib",
+    "require": {
+        "dintel/php-github-webhook": "0.1.*"
+    },
+    "require-dev": {
+        "dintel/php-github-webhook": "^0.1.1"
+    },
+    "license": "MIT",
+    "minimum-stability": "stable"
+}
