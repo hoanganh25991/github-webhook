@@ -13,19 +13,23 @@ try{
   $payloadObj = json_decode($payload, true);
   // $payloadObj = json_decode($payload);
 }catch(\Exception $e){
-  echo $payload;
+  _echo($payload);
   die;
 }
 
 $repositoryName = $payloadObj['repository']['name'];
 
+_echo("repository name: {$repositoryName}");
 
-
+//map repository & real project folder in server
 $map = [];
 
 $projectFolder = $repositoryName;
+
 //if $repository contains "laravel", remove it
-$isLaravelProject = is_numberic(strpos($projectFolder, "laravel"))? true : false;
+$isLaravelProject = is_numeric(strpos($projectFolder, "laravel"))? true : false;
+
+_echo("laravel project: {$isLaravelProject}");
 
 //rm laravel- from projectFolder name
 $projectFolder = str_replace("laravel-", "", $repositoryName);
