@@ -1,4 +1,11 @@
 <?php
+$msgs = [];
+
+function _echo($msg){
+	$msgs[] = $msg;
+	echo $msg;
+	echo "\r\n";
+}
 
 $payload = file_get_contents('php://input');
 
@@ -12,35 +19,48 @@ try{
 
 $repositoryName = $payloadObj['repository']['name'];
 
-$logFile = fopen("github-webhook.log", "w");
 
-$msgs = [];
 
 $map = [];
 
 $projectFolder = $repositoryName;
 //if $repository contains "laravel", remove it
+$isLaravelProject = is_numberic(strpos($projectFolder, "laravel"))? true : false;
+
+//rm laravel- from projectFolder name
 $projectFolder = str_replace("laravel-", "", $repositoryName);
+
 //deal with special case
 if(isset($map[$repositoryName])){
 	$projectFolder = $map[$repositoryName];
 }
 
-echo $projectFolder;
+//build full-path
+$projectFolder = __DIR__ . "/" . $projectFolder;
 
-chdir(__DIR__ . "/" . $projectFolder);
-$msgs[] = getcwd();
+_echo("project folder: {$projectFolder}");
 
-echo shell_exec("whoami");
+if(!is_dir($projectFolder)){
+	echo "mkdir {$projectFolder}";
+	mkdir($projectFolder);
+}
 
-echo shell_exec("git stash");
+_echo("chdir");
 
-echo shell_exec("git pull origin master");
+chdir($projectFolder);
 
-echo date("Y-m-d H:i:s");
+_echo(shell_exec("whoami"));
 
+_echo(shell_exec("git stash"));
+
+_echo(shell_exec("git pull origin master"));
+
+_echo( date("Y-m-d H:i:s"));
+
+
+//deal with NPM project
 if($repositoryName == "fabric-table-layout"){
-	echo "fabric-table-layout repository need NPM";
+	_echo("fabric-table-layout repository need NPM");
 	//www-data added to visudo
 	//www-data    ALL=NOPASSWD: /usr/bin/npm
 	//this means that www-data can run
@@ -48,13 +68,22 @@ if($repositoryName == "fabric-table-layout"){
 	//without prompt sudo password
 	//NPM MUST BE RUN BY SUDO
 	//update if some change on package.json
-	echo shell_exec("sudo npm install");
+	_echo(shell_exec("sudo npm install"));
 	//compile file
-	echo shell_exec("gulp");
+	_echo(shell_exec("gulp"));
 }
 
-$msg = implode("\n", $msgs);
-fwrite($logFile, $msg);
+//deal with laravel project
+if($isLaravelProject){
+	_echo(shell_exec("php artisan migrate"));
+}
+
+//write to log file
+$log = implode("\r\n", $msgs);
+
+$logFile = fopen("github-webhook.log", "w");
+
+fwrite($logFile, $log);
 
 fclose($logFile);
 
