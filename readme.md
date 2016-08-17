@@ -11,7 +11,9 @@ i have try `GitLab` & `GitHub`, both can get payload in HTTP POST from remote by
 when clone project, there are 2 types:
 
 1. HTTPS
-
+```	
+(ONLY this one can be used for auto-deploy, please, you know why ^^)
+```
 2. SSH
 
 /var/www/.ssh, generate `ssh` without *passphrase*
